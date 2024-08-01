@@ -11,7 +11,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: '#333',
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
@@ -84,6 +84,7 @@ export default function Home() {
       alignItems="center"
       p={3}
       gap={2}
+      bgcolor="#121212"
     >
       <Modal
         open={open}
@@ -91,7 +92,7 @@ export default function Home() {
         aria-labelledby="add-item-modal-title"
       >
         <Box sx={style}>
-          <Typography id="add-item-modal-title" variant="h6" component="h2">
+          <Typography id="add-item-modal-title" variant="h6" component="h2" color="white">
             Add Item
           </Typography>
           <Stack spacing={2} mt={2}>
@@ -101,6 +102,7 @@ export default function Home() {
               fullWidth
               value={itemName}
               onChange={(e) => setItemName(e.target.value)}
+              sx={{ input: { color: 'white' }, label: { color: 'white' } }}
             />
             <Button
               variant="contained"
@@ -145,18 +147,18 @@ export default function Home() {
           fullWidth
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, input: { color: 'white' }, label: { color: 'white' }, backgroundColor: '#333' }}
         />
 
         <Box sx={{ flex: 1, overflowY: 'auto' }}>
           <Stack spacing={2}>
             {filteredItems.map(({ name, count }) => (
-              <Card key={name} sx={{ bgcolor: '#F5F5F5', borderRadius: 2, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Card key={name} sx={{ bgcolor: '#2C2C2C', borderRadius: 2, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <CardContent>
-                  <Typography variant="h6">
+                  <Typography variant="h6" color="white">
                     {name.charAt(0).toUpperCase() + name.slice(1)}
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" color="white">
                     Quantity: {count}
                   </Typography>
                 </CardContent>
