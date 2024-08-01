@@ -22,36 +22,50 @@ const style = {
 
 export default function Home() {
   const [pantry, setPantry] = useState([])
+  const [filteredItems, setFilteredItems] = useState([])
 
   const [open, setOpen] = useState(false)
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
 
   const [itemName, setItemName] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
 
   const updatePantry = async () => {
     const snapshot = query(collection(firestore, 'pantry'))
     const docs = await getDocs(snapshot)
     const pantryList = []
     docs.forEach((doc) => {
-      pantryList.push({name: doc.id, ...doc.data()})
+      pantryList.push({ name: doc.id, ...doc.data() })
     })
     setPantry(pantryList)
+    setFilteredItems(pantryList)
   }
 
   useEffect(() => {
     updatePantry()
   }, [])
 
+  useEffect(() => {
+    if (searchQuery === "") {
+      setFilteredItems(pantry)
+    } else {
+      const lowerCaseQuery = searchQuery.toLowerCase()
+      const filtered = pantry.filter(({ name }) =>
+        name.toLowerCase().includes(lowerCaseQuery)
+      )
+      setFilteredItems(filtered)
+    }
+  }, [searchQuery, pantry])
+
   const addItem = async (item) => {
-    const docRef = doc(collection(firestore, "pantry"), item)
+    const docRef = doc(collection(firestore, "pantry"), item.toLowerCase())
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
-      const {count} = docSnap.data()
-      await setDoc(docRef, {count: count + 1})
-    }
-    else {
-      await setDoc(docRef, {count: 1})
+      const { count } = docSnap.data()
+      await setDoc(docRef, { count: count + 1 })
+    } else {
+      await setDoc(docRef, { count: 1 })
     }
     await updatePantry()
   }
@@ -60,12 +74,11 @@ export default function Home() {
     const docRef = doc(collection(firestore, "pantry"), item)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
-      const {count} = docSnap.data()
+      const { count } = docSnap.data()
       if (count === 1) {
         await deleteDoc(docRef)
-      }
-      else {
-        await setDoc(docRef, {count: count - 1})
+      } else {
+        await setDoc(docRef, { count: count - 1 })
       }
     }
     await updatePantry()
@@ -110,6 +123,16 @@ export default function Home() {
           </Stack>
         </Box>
       </Modal>
+      <Box width="800px" mb={2}>
+        <TextField
+          id="search"
+          label="Search"
+          variant="outlined"
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Box>
       <Button variant="contained"
         onClick={handleOpen}
       >Add</Button>
@@ -127,7 +150,7 @@ export default function Home() {
           </Typography>
         </Box>
         <Stack width="800px" height="300px" spacing={2} overflow={"auto"}>
-          {pantry.map(({ name, count }) => (
+          {filteredItems.map(({ name, count }) => (
             <Box
               key={name}
               width="100%"
